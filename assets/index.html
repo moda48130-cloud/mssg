@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>Victoria Assets Monitor</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>ยินดีต้อนรับสู่การแสดงตัวอย่างโครงการ</h1>
+  </header>
+  <main>
+    <section>
+      <h2>ผู้เล่นออนไลน์</h2>
+      <p>ข้อมูลเกี่ยวกับผู้เล่นออนไลน์จะแสดงที่นี่</p>
+      <!-- Optional: Add a script to fetch and display data from mock_online.json -->
+    </section>
+    <section>
+      <h2>ข้อมูลแจ็กพอต</h2>
+      <p>รายละเอียดเกี่ยวกับแจ็กพอตจะแสดงที่นี่</p>
+      <!-- Optional: Add a script to fetch and display data from mock_jackpot.json -->
+    </section>
+    <section class="status-box">
+      <div>
+        <span>ผู้เล่นออนไลน์:</span>
+        <span id="online-count">-</span>
+      </div>
+      <div>
+        <span>แจ็กพอต:</span>
+        <span id="jackpot-amount">-</span>
+      </div>
+      <div>
+        <span>อัปเดตล่าสุด:</span>
+        <span id="jackpot-time">-</span>
+      </div>
+    </section>
+    <section class="reviews" style="margin:20px 0; text-align:center;">
+      <div id="user-review" class="review-box"></div>
+    </section>
+    <section id="options" class="options-box">
+      <h3>ตั้งค่า</h3>
+      <label>
+        Refresh Interval (วินาที):
+        <input type="number" id="refresh-interval" min="5" value="10">
+      </label>
+      <button id="apply-options">บันทึก</button>
+    </section>
+  </main>
+  <footer>
+    <p>&copy; 2023 ชื่อโครงการ. สงวนลิขสิทธิ์.</p>
+  </footer>
+  <script src="script.js"></script>
+</body>
+</html>

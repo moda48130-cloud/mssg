@@ -1,0 +1,10 @@
+function fetchOnline() {
+  fetch('mock_online.json')
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById('online-number').textContent = data.online?.toLocaleString() || "N/A";
+    })
+    .catch(() => {
+      document.getElementById('online-number').textContent = "N/A";
+    });
+}

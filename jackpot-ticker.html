@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>แจ็กพอต Ticker</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f7f7f7;
+      margin: 0;
+      padding: 0;
+    }
+    .ticker-container {
+      width: 100%;
+      overflow: hidden;
+      background: #fffbe6;
+      border-bottom: 2px solid #ffd700;
+      padding: 1em 0;
+      box-shadow: 0 2px 8px #0001;
+    }
+    .ticker {
+      display: inline-block;
+      white-space: nowrap;
+      animation: tickerMove 18s linear infinite;
+      font-size: 1.3em;
+      color: #b8860b;
+      padding-left: 100%;
+    }
+    @keyframes tickerMove {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
+    }
+    .jp-label {
+      font-weight: bold;
+      color: #d4af37;
+      margin-right: 1em;
+    }
+  </style>
+</head>
+<body>
+  <div class="ticker-container">
+    <div class="ticker" id="jackpot-ticker"></div>
+  </div>
+  <script>
+    function updateJackpotTicker() {
+      fetch('mock_jackpot.json')
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          var jackpot = typeof data.jackpot !== "undefined" ? data.jackpot.toLocaleString() : "N/A";
+          var time = typeof data.time !== "undefined" ? data.time : "";
+          var tickerText = '<span class="jp-label">🎰 แจ็กพอตล่าสุด:</span> ' + jackpot + ' บาท <span style="margin-left:2em;">🕒 ' + time + '</span>';
+          document.getElementById('jackpot-ticker').innerHTML = tickerText;
+        })
+        .catch(function() {
+          document.getElementById('jackpot-ticker').textContent = "ไม่สามารถโหลดข้อมูลแจ็กพอตได้";
+        });
+    }
+    updateJackpotTicker();
+    setInterval(updateJackpotTicker, 10000);
+  </script>
+</body>
+</html>

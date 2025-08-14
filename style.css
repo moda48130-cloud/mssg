@@ -1,0 +1,18 @@
+body {
+  font-family: sans-serif;
+  background: #f7f7f7;
+  margin: 0;
+  padding: 0;
+}
+.status-box {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1em 2em;
+  max-width: 320px;
+  margin: 2em auto 1em auto;
+  box-shadow: 0 2px 8px #0001;
+}
+.status-box div {
+  margin: 1em 0;
+  font-size: 1.2em;
+}

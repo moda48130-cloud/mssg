@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>รายการฝาก/ถอน Ticker</title>
+  <style>
+    body {
+      background: #181818;
+      color: #fff;
+      font-family: 'Sarabun', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .ticker-container {
+      width: 100vw;
+      overflow: hidden;
+      background: #222;
+      border-top: 2px solid #444;
+      border-bottom: 2px solid #444;
+      height: 48px;
+      display: flex;
+      align-items: center;
+    }
+    .ticker {
+      display: inline-block;
+      white-space: nowrap;
+      will-change: transform;
+      font-size: 1.2rem;
+      padding-left: 100vw;
+      animation: tickerMove linear infinite;
+      animation-duration: 40s;
+    }
+    @keyframes tickerMove {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
+    }
+    .ticker span {
+      margin-right: 32px;
+    }
+  </style>
+</head>
+<body>
+  <div class="ticker-container">
+    <div class="ticker" id="ticker"></div>
+  </div>
+  <script>
+    // สุ่มเบอร์โทร
+    function randomPhone() {
+      const prefix = Math.random() < 0.5 ? '0864' : '0836';
+      let mid = '';
+      for (let i = 0; i < 3; i++) mid += Math.floor(Math.random() * 10);
+      // เลขท้ายแบบซ่อน
+      const hideType = Math.floor(Math.random() * 3);
+      let tail = '';
+      if (hideType === 0) tail = '***';
+      else if (hideType === 1) tail = '*' + Math.floor(Math.random() * 10) + '*';
+      else tail = '**' + Math.floor(Math.random() * 10);
+      return `user${prefix}${mid}${tail}`;
+    }
+
+    // สุ่มรายการฝาก/ถอน
+    function randomTransaction() {
+      const isDeposit = Math.random() < 0.5;
+      const user = randomPhone();
+      if (isDeposit) {
+        const amount = Math.floor(Math.random() * 101) + 100; // 100–200
+        return `<span>${user} ฝากเงิน ${amount.toLocaleString()} บาท 💰</span>`;
+      } else {
+        const amount = Math.floor(Math.random() * 9701) + 300; // 300–10,000
+        return `<span>${user} ถอนเงิน ${amount.toLocaleString()} บาท 💸</span>`;
+      }
+    }
+
+    // สร้างข้อความ ticker
+    function generateTickerItems(n = 8) {
+      let items = [];
+      for (let i = 0; i < n; i++) items.push(randomTransaction());
+      return items.join(' • ');
+    }
+
+    // อัปเดต ticker ทุก 10–20 นาที
+    function randomInterval() {
+      return (Math.floor(Math.random() * 11) + 10) * 60 * 1000;
+    }
+
+    function updateTicker() {
+      const ticker = document.getElementById('ticker');
+      ticker.innerHTML = generateTickerItems();
+      // รีเซ็ต animation เพื่อให้ไหลต่อเนื่อง
+      ticker.style.animation = 'none';
+      void ticker.offsetWidth; // trigger reflow
+      ticker.style.animation = '';
+    }
+
+    updateTicker();
+    setInterval(updateTicker, randomInterval());
+  </script>
+</body>
+</html>
