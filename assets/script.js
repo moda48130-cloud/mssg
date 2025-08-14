@@ -89,3 +89,40 @@
   setInterval(fetchOnline, 10000);
   setInterval(fetchJackpot, 10000);
 })();
+//function updateTime() {
+  const now = new Date();
+  const optionsDate = {
+    timeZone: 'Asia/Bangkok',
+      day: 'numeric',
+        month: 'long',
+          year: 'numeric'
+          };
+          const optionsTime = {
+            timeZone: 'Asia/Bangkok',
+              hour: '2-digit',
+                minute: '2-digit',
+                  second: '2-digit',
+                    hour12: false
+                    };
+
+                    const dateThai = now.toLocaleDateString('th-TH', optionsDate);
+                    const timeThai = now.toLocaleTimeString('th-TH', optionsTime);
+                    document.getElementById('date').textContent = dateThai;
+                    document.getElementById('time').textContent = timeThai;
+                    fetch('assets/mock_online.json')
+                      .then(response => response.json())
+                        .then(data => {
+                            const rawTime = new Date(data.last_updated);
+                                const options = {
+                                      timeZone: 'Asia/Bangkok',
+                                            year: 'numeric',
+                                                  month: 'long',
+                                                        day: 'numeric',
+                                                              hour: '2-digit',
+                                                                    minute: '2-digit',
+                                                                          second: '2-digit',
+                                                                                hour12: false
+                                                                                    };
+                                                                                        const formattedTime = rawTime.toLocaleString('th-TH', options);
+                                                                                            document.getElementById('lastUpdated').textContent = formattedTime + ' น.';
+                                                                                              });

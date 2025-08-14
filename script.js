@@ -82,10 +82,48 @@
 
   updateStats();
   startAutoRefresh();
-  fetchReviews();
-  setInterval(rotateReview, 7000);
   fetchOnline();
   fetchJackpot();
   setInterval(fetchOnline, 10000);
   setInterval(fetchJackpot, 10000);
 })();
+//(function () {
+  let refreshInterval = 10000; // ค่าเริ่มต้น 10 วินาที
+    let refreshTimer;
+    
+      function fetchMockData() {
+          fetch('mock_online.json')
+                .then(res => res.json())
+                      .then(data => {
+                              document.getElementById('online-count').textContent = data.online;
+                                    })
+                                          .catch(() => {
+                                                  document.getElementById('online-count').textContent = 'ไม่สามารถโหลดข้อมูลได้';
+                                                        });
+
+                                                            fetch('mock_jackpot.json')
+                                                                  .then(res => res.json())
+                                                                        .then(data => {
+                                                                                document.getElementById('jackpot-amount').textContent = data.jackpot;
+                                                                                        document.getElementById('jackpot-time').textContent = new Date().toLocaleString('th-TH');
+                                                                                              })
+                                                                                                    .catch(() => {
+                                                                                                            document.getElementById('jackpot-amount').textContent = 'ไม่สามารถโหลดข้อมูลได้';
+                                                                                                                  });
+                                                                                                                    }
+
+                                                                                                                      function startAutoRefresh() {
+                                                                                                                          clearInterval(refreshTimer);
+                                                                                                                              fetchMockData(); // โหลดทันที
+                                                                                                                                  refreshTimer = setInterval(fetchMockData, refreshInterval);
+                                                                                                                                    }
+
+                                                                                                                                      document.getElementById('apply-options').addEventListener('click', () => {
+                                                                                                                                          const selected = document.getElementById('refresh-interval').value;
+                                                                                                                                              refreshInterval = parseInt(selected, 10);
+                                                                                                                                                  startAutoRefresh();
+                                                                                                                                                    });
+
+                                                                                                                                                      // เริ่มต้นเมื่อโหลดหน้า
+                                                                                                                                                        startAutoRefresh();
+                                                                                                                                                        })();

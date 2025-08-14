@@ -13,7 +13,7 @@
     <section>
       <h2>ผู้เล่นออนไลน์</h2>
       <p>ข้อมูลเกี่ยวกับผู้เล่นออนไลน์จะแสดงที่นี่</p>
-      <!-- Optional: Add a script to fetch and display data from mock_online.json -->
+      <!-- Optional: Add a script to fetch and Add data from mock_online.json -->
     </section>
     <section>
       <h2>ข้อมูลแจ็กพอต</h2>
@@ -49,4 +49,22 @@
   <script src="script.js"></script>
 </body>
 </html>
-
+<!-- ✅ วางตรงนี้ก่อนปิด body -->
+<div class="time-block">
+  <span class="label">วันที่:</span> <span id="date"></span><br>
+    <span class="label">เวลา:</span> <span id="time"></span> น.
+    </div>
+    
+    <script>
+      const now = new Date();
+        const optionsDate = { day: 'numeric', month: 'long', year: 'numeric' };
+          const dateThai = now.toLocaleDateString('th-TH', optionsDate);
+            const hours = now.getHours().toString().padStart(2, '0');
+              const minutes = now.getMinutes().toString().padStart(2, '0');
+                const seconds = now.getSeconds().toString().padStart(2, '0');
+                  const timeThai = `${hours}:${minutes}:${seconds}`;
+                    document.getElementById("date").textContent = dateThai;
+                      document.getElementById("time").textContent = timeThai;
+                      </script>
+                      </body>
+                      </html>-->
