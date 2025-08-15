@@ -1,0 +1,17 @@
+{
+  "online_count": 1287,
+  "last_updated": "2025-08-15T06:30:00+07:00",
+  "actions": [
+    {
+      "type": "win",
+      "username": "user001",
+      "timestamp": "2025-08-15T06:29:00+07:00"
+    },
+    {
+      "type": "hnn",
+      "amount": 500,
+      "username": "user002",
+      "timestamp": "2025-08-15T06:28:00+07:00"
+    }
+  ]
+}
