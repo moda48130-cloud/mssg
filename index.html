@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <title>Victoria Club - Mock Dashboard</title>
+  <title>Mock Dashboard - Moda</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body { font-family: sans-serif; background: #111; color: #fff; text-align: center; padding: 40px; }
@@ -10,6 +10,18 @@
     .label { font-size: 1.2em; margin-bottom: 10px; }
     .value { font-size: 2em; font-weight: bold; color: #0f0; }
     .timestamp { font-size: 0.9em; color: #ccc; margin-top: 10px; }
+    .marquee {
+      overflow: hidden;
+      white-space: nowrap;
+      box-sizing: border-box;
+      animation: slide 10s linear infinite;
+      font-size: 1.8em;
+      color: #ffd700;
+    }
+    @keyframes slide {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
   </style>
 </head>
 <body>
@@ -20,9 +32,8 @@
   </div>
 
   <div class="box">
-    <div class="label">ยอดแจ็กพอต</div>
-    <div id="jackpot-amount" class="value">กำลังโหลด...</div>
-    <div id="jackpot-time" class="timestamp"></div>
+    <div class="label">แจ็กพอตล่าสุด</div>
+    <div id="jackpot-slide" class="marquee">กำลังโหลด...</div>
   </div>
 
   <script>
@@ -35,6 +46,40 @@
         day: '2-digit',
         month: 'short',
         year: 'numeric'
+      });
+    }
+
+    function fetchData() {
+      Promise.all([
+        fetch('https://moda48130-cloud.github.io/mssg/mock_online.json').then(res => res.json()),
+        fetch('https://moda48130-cloud.github.io/mssg/mock_jackpot.json').then(res => res.json())
+      ])
+      .then(([onlineData, jackpotData]) => {
+        const onlineCountElement = document.getElementById('online-count');
+        const onlineTimeElement = document.getElementById('online-time');
+        const jackpotSlideElement = document.getElementById('jackpot-slide');
+
+        if (onlineCountElement && onlineData.online_count) {
+          onlineCountElement.textContent = onlineData.online_count;
+          onlineTimeElement.textContent = 'อัปเดตล่าสุด: ' + formatTime();
+        }
+
+        if (jackpotSlideElement && jackpotData.jackpot) {
+          jackpotSlideElement.textContent = `🎰 แจ็กพอตล่าสุด: ${jackpotData.jackpot.toLocaleString('en-US')} บาท 💸`;
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+        document.getElementById('online-count').textContent = 'N/A';
+        document.getElementById('jackpot-slide').textContent = 'N/A';
+      });
+    }
+
+    fetchData();
+    setInterval(fetchData, 10000);
+  </script>
+</body>
+</html>    year: 'numeric'
       });
     }
 
