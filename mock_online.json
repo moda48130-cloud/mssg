@@ -1,17 +1,32 @@
-{
-  "online_count": 1287,
-  "last_updated": "2025-08-15T06:30:00+07:00",
-  "actions": [
-    {
-      "type": "win",
-      "username": "user001",
-      "timestamp": "2025-08-15T06:29:00+07:00"
-    },
-    {
-      "type": "hnn",
-      "amount": 500,
-      "username": "user002",
-      "timestamp": "2025-08-15T06:28:00+07:00"
-    }
-  ]
+let currentOnline = Math.floor(Math.random() * 9000 + 10000); // เริ่มต้น 10,000–18,999
+let direction = 1; // 1 = เพิ่ม, -1 = ลด
+
+function formatThaiTime(date = new Date()) {
+  const d = date;
+  const day = d.getDate();
+  const month = d.toLocaleString("th-TH", { month: "short" });
+  const year = d.getFullYear() + 543;
+  const time = d.toLocaleTimeString("th-TH", { hour: "2-digit", minute: "2-digit" });
+  return `${day} ${month} ${year} ${time}`;
 }
+
+function updateMockOnline() {
+  // สุ่มจำนวนเปลี่ยน 1–10 คน
+  const delta = Math.floor(Math.random() * 10 + 1);
+  currentOnline += direction * delta;
+
+  // จำกัดช่วง 10,000–19,999
+  if (currentOnline >= 19999) direction = -1;
+  if (currentOnline <= 10000) direction = 1;
+
+  const countEl = document.getElementById("online-count");
+  const timeEl = document.getElementById("online-time");
+
+  if (countEl) countEl.textContent = currentOnline.toLocaleString();
+  if (timeEl) timeEl.textContent = `อัปเดตล่าสุดเมื่อ ${formatThaiTime()}`;
+
+  // สลับจังหวะทุก 1 นาที
+  setTimeout(updateMockOnline, 60000);
+}
+
+updateMockOnline(); // เริ่มต้น
