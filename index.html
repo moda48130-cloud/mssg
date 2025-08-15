@@ -25,70 +25,17 @@
   </style>
 </head>
 <body>
-  <script src="script.js"></script>
+
   <div class="box">
     <div class="label">ผู้เล่นออนไลน์</div>
     <div id="online-count" class="value">กำลังโหลด...</div>
     <div id="online-time" class="timestamp"></div>
-<!-- 🔴 Ticker Slide -->
-<div class="section ticker" id="ticker">
-  <span id="ticker-slide">กำลังโหลดข้อมูล...</span>
-</div>
-
-<style>
-  .ticker {
-    white-space: nowrap;
-    overflow: hidden;
-    background: #222;
-    padding: 0.5rem;
-    border-top: 1px solid #444;
-    border-bottom: 1px solid #444;
-  }
-  .ticker span {
-    display: inline-block;
-    padding-right: 2rem;
-    animation: scroll 25s linear infinite;
-    color: #0f0;
-  }
-  @keyframes scroll {
-    0% { transform: translateX(100%); }
-    100% { transform: translateX(-100%); }
-  }
-</style>
-
-<script>
-  const onlineURL = "https://moda48130-cloud.github.io/mssg/mock_online.json";
-  const jackpotURL = "https://moda48130-cloud.github.io/mssg/mock_jackpot.json";
-
-  async function updateTicker() {
-    try {
-      const [onlineRes, jackpotRes] = await Promise.all([
-        fetch(onlineURL).then(r => r.json()),
-        fetch(jackpotURL).then(r => r.json())
-      ]);
-
-      const onlineList = onlineRes.list || ["Guest01", "Guest02"];
-      const jackpotList = jackpotRes.list || ["฿1,000", "฿2,500"];
-
-      const tickerItems = [
-        ...onlineList.map(name => `🎮 ${name}`),
-        ...jackpotList.map(prize => `💰 ${prize}`)
-      ];
-
-      document.getElementById("ticker-slide").textContent = tickerItems.join(" • ");
-    } catch {
-      document.getElementById("ticker-slide").textContent = "ไม่สามารถโหลดข้อมูลได้";
-    }
-  }
-
-  updateTicker();
-  setInterval(updateTicker, 30000); // รีเฟรชทุก 30 วินาที
-</script>
   </div>
 
   <div class="box">
     <div class="label">แจ็กพอตล่าสุด</div>
     <div id="jackpot-slide" class="marquee">กำลังโหลด...</div>
+    <div id="jackpot-slide-custom" class="marquee">กำลังสุ่มแจ็กพอต...</div>
   </div>
 
   <script>
@@ -133,8 +80,75 @@
     fetchData();
     setInterval(fetchData, 10000);
   </script>
+
+  <script>
+    const users = [
+      "ยูส0846454***", "ยูส0953821***", "ยูส0639283***",
+      "ยูส0827412***", "ยูส0913847***", "ยูส0882934***"
+    ];
+    const prizes = ["฿1,200", "฿2,500", "฿3,000", "฿8,800", "฿2,200"];
+    const games = ["Galaxy Miner PG", "Wild Bandito", "Alchemy Gold", "Dragon Legend", "Muay Thai Champion"];
+
+    function getRandomItem(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function updateCustomJackpot() {
+      const user = getRandomItem(users);
+      const prize = getRandomItem(prizes);
+      const game = getRandomItem(games);
+      const message = `🎉 ${user} ได้รับแจ็กพอตในเกม ${game} จำนวน ${prize} บาท 💥`;
+      const el = document.getElementById("jackpot-slide-custom");
+      if (el) el.textContent = message;
+    }
+
+    function randomMinutesInterval() {
+      return Math.floor(Math.random() * 5 + 5) * 60000;
+    }
+
+    function loopCustomJackpot() {
+      updateCustomJackpot();
+      setTimeout(loopCustomJackpot, randomMinutesInterval());
+    }
+
+    loopCustomJackpot();
+  </script>
+
 </body>
-</html>    year: 'numeric'
+</html>
+<script>
+const users = [
+  "ยูส0846454***", "ยูส0953821***", "ยูส0639283***",
+  "ยูส0827412***", "ยูส0913847***", "ยูส0882934***"
+];
+const prizes = ["฿1,200", "฿2,500", "฿3,000", "฿8,800", "฿2,200"];
+const games = ["Galaxy Miner PG", "Wild Bandito", "Alchemy Gold", "Dragon Legend", "Muay Thai Champion"];
+
+function getRandomItem(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function updateCustomJackpot() {
+  const user = getRandomItem(users);
+  const prize = getRandomItem(prizes);
+  const game = getRandomItem(games);
+  const message = `🎉 ${user} ได้รับแจ็กพอตในเกม ${game} จำนวน ${prize} บาท 💥`;
+  const el = document.getElementById("jackpot-slide-custom");
+  if (el) el.textContent = message;
+}
+
+function randomMinutesInterval() {
+  return Math.floor(Math.random() * 5 + 5) * 60000;
+}
+
+function loopCustomJackpot() {
+  updateCustomJackpot();
+  setTimeout(loopCustomJackpot, randomMinutesInterval());
+}
+
+loopCustomJackpot();
+</script>
+
       });
     }
 
