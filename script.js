@@ -1,129 +1,32 @@
-(function() {
-  var interval = 10000;
-  var timerOnline, timerJackpot;
+<script>
+  const onlineURL = "https://moda48130-cloud.github.io/mssg/mock_online.json";
+  const jackpotURL = "https://moda48130-cloud.github.io/mssg/mock_jackpot.json";
 
-  function updateStats() {
-    fetchOnline();
-    fetchJackpot();
-  }
+  async function updateTicker() {
+    try {
+      const [onlineRes, jackpotRes] = await Promise.all([
+        fetch(onlineURL).then(r => r.json()),
+        fetch(jackpotURL).then(r => r.json())
+      ]);
 
-  function fetchOnline() {
-    fetch('mock_online.json')
-      .then(function(res) { return res.json(); })
-      .then(function(data) {
-        document.getElementById('online-count').textContent = (typeof data.online !== "undefined") ? data.online : "N/A";
-      })
-      .catch(function() {
-        document.getElementById('online-count').textContent = "N/A";
-      });
-  }
+      // ✅ ตรวจสอบ key ที่ใช้ใน mock JSON
+      const onlineList = onlineRes.list || onlineRes.online || ["Guest01", "Guest02"];
+      const jackpotList = jackpotRes.list || jackpotRes.jackpot || ["฿1,000", "฿2,500"];
 
-  function fetchJackpot() {
-    fetch('mock_jackpot.json')
-      .then(function(res) { return res.json(); })
-      .then(function(data) {
-        document.getElementById('jackpot-amount').textContent = (typeof data.jackpot !== "undefined") ? data.jackpot : "N/A";
-        // ใช้เวลาปัจจุบันแทน
-        var now = new Date();
-        var formatted = now.toLocaleString('th-TH', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit'
-        });
-        document.getElementById('jackpot-time').textContent = formatted;
-      })
-      .catch(function() {
-        document.getElementById('jackpot-amount').textContent = "N/A";
-        document.getElementById('jackpot-time').textContent = "N/A";
-      });
-  }
+      // ✅ รวมข้อมูลเป็นข้อความ ticker
+      const tickerItems = [
+        ...onlineList.map(name => `🎮 ${name}`),
+        ...jackpotList.map(prize => `💰 ${prize}`)
+      ];
 
-  var reviews = [];
-  var reviewIndex = 0;
-
-  function fetchReviews() {
-    fetch('mock_review.json')
-      .then(function(res) { return res.json(); })
-      .then(function(data) {
-        reviews = Array.isArray(data.reviews) ? data.reviews : [];
-        rotateReview();
-      })
-      .catch(function() {
-        reviews = ["ไม่สามารถโหลดรีวิวได้"];
-        rotateReview();
-      });
-  }
-
-  function rotateReview() {
-    var el = document.getElementById('user-review');
-    if (el && reviews.length > 0) {
-      el.textContent = reviews[reviewIndex];
-      reviewIndex = (reviewIndex + 1) % reviews.length;
+      // ✅ อัปเดต DOM
+      document.getElementById("ticker-slide").textContent = tickerItems.join(" • ");
+    } catch {
+      document.getElementById("ticker-slide").textContent = "ไม่สามารถโหลดข้อมูลได้";
     }
   }
 
-  function startAutoRefresh() {
-    clearInterval(timerOnline);
-    clearInterval(timerJackpot);
-    timerOnline = setInterval(fetchOnline, interval);
-    timerJackpot = setInterval(fetchJackpot, interval);
-  }
-
-  document.getElementById('apply-options').onclick = function() {
-    var val = parseInt(document.getElementById('refresh-interval').value, 10);
-    if (!isNaN(val) && val >= 5) {
-      interval = val * 1000;
-      startAutoRefresh();
-    }
-  };
-
-  updateStats();
-  startAutoRefresh();
-  fetchOnline();
-  fetchJackpot();
-  setInterval(fetchOnline, 10000);
-  setInterval(fetchJackpot, 10000);
-})();
-//(function () {
-  let refreshInterval = 10000; // ค่าเริ่มต้น 10 วินาที
-    let refreshTimer;
-    
-      function fetchMockData() {
-          fetch('mock_online.json')
-                .then(res => res.json())
-                      .then(data => {
-                              document.getElementById('online-count').textContent = data.online;
-                                    })
-                                          .catch(() => {
-                                                  document.getElementById('online-count').textContent = 'ไม่สามารถโหลดข้อมูลได้';
-                                                        });
-
-                                                            fetch('mock_jackpot.json')
-                                                                  .then(res => res.json())
-                                                                        .then(data => {
-                                                                                document.getElementById('jackpot-amount').textContent = data.jackpot;
-                                                                                        document.getElementById('jackpot-time').textContent = new Date().toLocaleString('th-TH');
-                                                                                              })
-                                                                                                    .catch(() => {
-                                                                                                            document.getElementById('jackpot-amount').textContent = 'ไม่สามารถโหลดข้อมูลได้';
-                                                                                                                  });
-                                                                                                                    }
-
-                                                                                                                      function startAutoRefresh() {
-                                                                                                                          clearInterval(refreshTimer);
-                                                                                                                              fetchMockData(); // โหลดทันที
-                                                                                                                                  refreshTimer = setInterval(fetchMockData, refreshInterval);
-                                                                                                                                    }
-
-                                                                                                                                      document.getElementById('apply-options').addEventListener('click', () => {
-                                                                                                                                          const selected = document.getElementById('refresh-interval').value;
-                                                                                                                                              refreshInterval = parseInt(selected, 10);
-                                                                                                                                                  startAutoRefresh();
-                                                                                                                                                    });
-
-                                                                                                                                                      // เริ่มต้นเมื่อโหลดหน้า
-                                                                                                                                                        startAutoRefresh();
-                                                                                                                                                        })();
+  // ✅ เรียกใช้งานครั้งแรก และตั้ง auto-refresh
+  updateTicker();
+  setInterval(updateTicker, 30000); // รีเฟรชทุก 30 วินาที
+</script>

@@ -2,98 +2,248 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-    <title>ETBET Mock Page</title>
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      </head>
-      <body style="font-family:sans-serif;background:#f9f9f9;padding:20px;">
+  <title>Mock Dashboard - Moda</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: sans-serif; background: #111; color: #fff; text-align: center; padding: 40px; }
+    .box { margin: 20px auto; padding: 20px; background: #222; border-radius: 8px; width: 300px; box-shadow: 0 0 10px #000; }
+    .label { font-size: 1.2em; margin-bottom: 10px; }
+    .value { font-size: 2em; font-weight: bold; color: #0f0; }
+    .timestamp { font-size: 0.9em; color: #ccc; margin-top: 10px; }
+    .marquee {
+      overflow: hidden;
+      white-space: nowrap;
+      box-sizing: border-box;
+      animation: slide 10s linear infinite;
+      font-size: 1.8em;
+      color: #ffd700;
+    }
+    @keyframes slide {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
+    }
+  </style>
+</head>
+<body>
 
-      <div style="text-align:center;padding:20px;border:1px solid #ccc;border-radius:8px;background:#fff;">
-        <h3 style="margin-bottom:10px;">👥 ผู้ใช้งานออนไลน์ขณะนี้</h3>
-          <div id="onlineCount" style="font-size:32px;font-weight:bold;color:#2196f3;">–</div>
-            <p id="lastUpdated" style="font-size:12px;color:#888;">กำลังโหลด...</p>
-            </div>
+  <div class="box">
+    <div class="label">ผู้เล่นออนไลน์</div>
+    <div id="online-count" class="value">กำลังโหลด...</div>
+    <div id="online-time" class="timestamp"></div>
+  </div>
 
-            <div id="ticker" style="margin-top:10px;font-size:14px;color:#444;padding:10px;border-top:1px dashed #ccc;">กำลังโหลดกิจกรรม...</div>
+  <div class="box">
+    <div class="label">แจ็กพอตล่าสุด</div>
+    <div id="jackpot-slide" class="marquee">กำลังโหลด...</div>
+    <div id="jackpot-slide-custom" class="marquee">กำลังสุ่มแจ็กพอต...</div>
+  </div>
+<script>
+let jackpotValue = 456789;
+const jackpotEl = document.getElementById("jackpot-slide");
 
-            <script>
-            const DATA_URL = "./mock_online.json"; // ใช้ไฟล์ใน repo เดียวกัน
-            let tickerInterval = null;
+function formatTime() {
+  const now = new Date();
+  return now.toLocaleString('th-TH', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  });
+}
 
-            function formatThaiDateTime(date) {
-              const dateThai = date.toLocaleDateString('th-TH', {
-                  timeZone: 'Asia/Bangkok',
-                      day: 'numeric',
-                          month: 'short',
-                              year: 'numeric'
-                                });
-                                  const timeThai = date.toLocaleTimeString('th-TH', {
-                                      timeZone: 'Asia/Bangkok',
-                                          hour: '2-digit',
-                                              minute: '2-digit',
-                                                  second: '2-digit',
-                                                      hour12: false
-                                                        });
-                                                          return `${dateThai} ${timeThai}`;
-                                                          }
+function updateJackpotCounter() {
+  jackpotValue += Math.floor(Math.random() * 10 + 1);
+  if (jackpotEl) {
+    jackpotEl.textContent = `🎰 แจ็กพอตล่าสุด: ${jackpotValue.toLocaleString('en-US')} บาท 💸`;
+  }
+}
 
-                                                          function formatAction(action) {
-                                                            const time = new Date(action.timestamp).toLocaleTimeString('th-TH', {
-                                                                timeZone: 'Asia/Bangkok',
-                                                                    hour: '2-digit',
-                                                                        minute: '2-digit',
-                                                                            second: '2-digit',
-                                                                                hour12: false
-                                                                                  });
+function fetchData() {
+  Promise.all([
+    fetch('https://moda48130-cloud.github.io/mssg/mock_online.json').then(res => res.json()),
+    fetch('https://moda48130-cloud.github.io/mssg/mock_jackpot.json').then(res => res.json())
+  ])
+  .then(([onlineData, jackpotData]) => {
+    const onlineCountElement = document.getElementById('online-count');
+    const jackpotAmountElement = document.getElementById('jackpot-amount');
+    const onlineTimeElement = document.getElementById('online-time');
+    const jackpotTimeElement = document.getElementById('jackpot-time');
 
-                                                                                    if (action.type === "ฝาก" || action.type === "ถอน") {
-                                                                                        return `${time} - ${action.username} ${action.type} ${action.amount.toLocaleString()} บาท`;
-                                                                                          } else if (action.type === "สมัคร") {
-                                                                                              return `${time} - ${action.username} สมัครสมาชิกใหม่`;
-                                                                                                } else {
-                                                                                                    return `${time} - กิจกรรมไม่ทราบประเภท`;
-                                                                                                      }
-                                                                                                      }
+    if (onlineCountElement && onlineData.online) {
+      onlineCountElement.textContent = onlineData.online;
+      onlineTimeElement.textContent = 'อัปเดตล่าสุด: ' + formatTime();
+    }
+    if (jackpotAmountElement && jackpotData.jackpot) {
+      jackpotAmountElement.textContent = jackpotData.jackpot.toLocaleString('en-US');
+      jackpotTimeElement.textContent = 'อัปเดตล่าสุด: ' + formatTime();
+    }
+  })
+  .catch(error => {
+    console.error('Error fetching data:', error);
+    document.getElementById('online-count').textContent = 'N/A';
+    document.getElementById('jackpot-amount').textContent = 'N/A';
+  });
+}
 
-                                                                                                      async function updateOnlineStats() {
-                                                                                                        try {
-                                                                                                            const res = await fetch(DATA_URL);
-                                                                                                                const data = await res.json();
+function updateCustomJackpot() {
+  const users = ["ยูส0846454***", "ยูส0953821***", "ยูส0639283***", "ยูส0827412***", "ยูส0913847***", "ยูส0882934***"];
+  const prizes = ["฿1,200", "฿2,500", "฿3,000", "฿8,800", "฿2,200"];
+  const games = ["Galaxy Miner PG", "Wild Bandito", "Alchemy Gold", "Dragon Legend", "Muay Thai Champion"];
+  const user = users[Math.floor(Math.random() * users.length)];
+  const prize = prizes[Math.floor(Math.random() * prizes.length)];
+  const game = games[Math.floor(Math.random() * games.length)];
+  const message = `🎉 ${user} ได้รับแจ็กพอตในเกม ${game} จำนวน ${prize} บาท 💥`;
+  const el = document.getElementById("jackpot-slide-custom");
+  if (el) el.textContent = message;
+}
 
-                                                                                                                    const count = data.online_count || 0;
-                                                                                                                        document.getElementById("onlineCount").textContent = count.toLocaleString('th-TH') + " คน";
+function loopCustomJackpot() {
+  updateCustomJackpot();
+  setTimeout(loopCustomJackpot, Math.floor(Math.random() * 5 + 5) * 60000);
+}
 
-                                                                                                                            const updated = new Date(data.last_updated);
-                                                                                                                                document.getElementById("lastUpdated").textContent = `อัปเดตล่าสุดเมื่อ ${formatThaiDateTime(updated)}`;
+fetchData();
+setInterval(fetchData, 10000);
+setInterval(updateJackpotCounter, 1000);
+loopCustomJackpot();
+</script>
 
-                                                                                                                                    const actions = data.actions || [];
-                                                                                                                                        let index = 0;
-                                                                                                                                            const ticker = document.getElementById("ticker");
 
-                                                                                                                                                function showNext() {
-                                                                                                                                                      ticker.textContent = formatAction(actions[index]);
-                                                                                                                                                            index = (index + 1) % actions.length;
-                                                                                                                                                                }
+<script>
+let jackpotValue = 456789;
+const jackpotEl = document.getElementById("jackpot-slide");
 
-                                                                                                                                                                    if (tickerInterval) clearInterval(tickerInterval);
-                                                                                                                                                                        if (actions.length > 0) {
-                                                                                                                                                                              showNext();
-                                                                                                                                                                                    tickerInterval = setInterval(showNext, 5000);
-                                                                                                                                                                                        } else {
-                                                                                                                                                                                              ticker.textContent = "ไม่มีข้อมูลกิจกรรม";
-                                                                                                                                                                                                  }
+function formatTime() {
+  const now = new Date();
+  return now.toLocaleString('th-TH', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  });
+}
 
-                                                                                                                                                                                                    } catch (err) {
-                                                                                                                                                                                                        document.getElementById("onlineCount").textContent = "–";
-                                                                                                                                                                                                            document.getElementById("lastUpdated").textContent = "ไม่สามารถโหลดข้อมูลได้";
-                                                                                                                                                                                                                document.getElementById("ticker").textContent = "ไม่สามารถโหลดกิจกรรมได้";
-                                                                                                                                                                                                                  }
-                                                                                                                                                                                                                  }
+function fetchData() {
+  Promise.all([
+    fetch('https://moda48130-cloud.github.io/mssg/mock_online.json').then(res => res.json()),
+    fetch('https://moda48130-cloud.github.io/mssg/mock_jackpot.json').then(res => res.json())
+  ])
+  .then(([onlineData, jackpotData]) => {
+    const onlineCountElement = document.getElementById('online-count');
+    const jackpotAmountElement = document.getElementById('jackpot-amount');
+    const onlineTimeElement = document.getElementById('online-time');
+    const jackpotTimeElement = document.getElementById('jackpot-time');
 
-                                                                                                                                                                                                                  document.addEventListener("DOMContentLoaded", () => {
-                                                                                                                                                                                                                    updateOnlineStats();
-                                                                                                                                                                                                                      setInterval(updateOnlineStats, 60000);
-                                                                                                                                                                                                                      });
-                                                                                                                                                                                                                      </script>
+    if (onlineCountElement && onlineData.online) {
+      onlineCountElement.textContent = onlineData.online;
+      onlineTimeElement.textContent = 'อัปเดตล่าสุด: ' + formatTime();
+    }
+    if (jackpotAmountElement && jackpotData.jackpot) {
+      jackpotAmountElement.textContent = jackpotData.jackpot.toLocaleString('en-US');
+      jackpotTimeElement.textContent = 'อัปเดตล่าสุด: ' + formatTime();
+    }
 
-                                                                                                                                                                                                                      </body>
-                                                                                                                                                                                                                      </html>
+    // sync jackpotValue จาก mock
+    if (jackpotData.jackpot) {
+      jackpotValue = jackpotData.jackpot;
+      if (jackpotEl) {
+        jackpotEl.textContent = `🎰 แจ็กพอตล่าสุด: ${jackpotValue.toLocaleString('en-US')} บาท 💸`;
+      }
+    }
+  })
+  .catch(error => {
+    console.error('Error fetching data:', error);
+    document.getElementById('online-count').textContent = 'N/A';
+    document.getElementById('jackpot-amount').textContent = 'N/A';
+  });
+}
+
+function updateJackpotCounter() {
+  jackpotValue += Math.floor(Math.random() * 10 + 1);
+  if (jackpotEl) {
+    jackpotEl.textContent = `🎰 แจ็กพอตล่าสุด: ${jackpotValue.toLocaleString('en-US')} บาท 💸`;
+  }
+}
+
+const users = ["ยูส0846454***", "ยูส0953821***", "ยูส0639283***", "ยูส0827412***", "ยูส0913847***", "ยูส0882934***"];
+const prizes = ["฿1,200", "฿2,500", "฿3,000", "฿8,800", "฿2,200"];
+const games = ["Galaxy Miner PG", "Wild Bandito", "Alchemy Gold", "Dragon Legend", "Muay Thai Champion"];
+
+function getRandomItem(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function updateCustomJackpot() {
+  const user = getRandomItem(users);
+  const prize = getRandomItem(prizes);
+  const game = getRandomItem(games);
+  const message = `🎉 ${user} ได้รับแจ็กพอตในเกม ${game} จำนวน ${prize} บาท 💥`;
+  const el = document.getElementById("jackpot-slide-custom");
+  if (el) el.textContent = message;
+}
+
+function loopCustomJackpot() {
+  updateCustomJackpot();
+  setTimeout(loopCustomJackpot, Math.floor(Math.random() * 5 + 5) * 60000);
+}
+
+// เริ่มทำงาน
+fetchData();
+setInterval(fetchData, 10000);
+setInterval(updateJackpotCounter, 1000);
+loopCustomJackpot();
+</script>
+
+      });
+    }
+
+    function fetchData() {
+      Promise.all([
+        fetch('https://moda48130-cloud.github.io/mssg/mock_online.json').then(res => res.json()),
+        fetch('https://moda48130-cloud.github.io/mssg/mock_jackpot.json').then(res => res.json())
+      ])
+      .then(([onlineData, jackpotData]) => {
+        const onlineCountElement = document.getElementById('online-count');
+        const jackpotAmountElement = document.getElementById('jackpot-amount');
+        const onlineTimeElement = document.getElementById('online-time');
+        const jackpotTimeElement = document.getElementById('jackpot-time');
+
+        if (onlineCountElement && onlineData.online) {
+          onlineCountElement.textContent = onlineData.online;
+          onlineTimeElement.textContent = 'อัปเดตล่าสุด: ' + formatTime();
+        }
+
+        if (jackpotAmountElement && jackpotData.jackpot) {
+          jackpotAmountElement.textContent = jackpotData.jackpot.toLocaleString('en-US');
+          jackpotTimeElement.textContent = 'อัปเดตล่าสุด: ' + formatTime();
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error);
+        document.getElementById('online-count').textContent = 'N/A';
+        document.getElementById('jackpot-amount').textContent = 'N/A';
+      });
+    }
+
+    fetchData();
+    setInterval(fetchData, 10000);
+  </script>
+</body>
+      </html>
+<script>
+let jackpotValue = 456789; // เริ่มต้นจาก mock JSON
+const jackpotEl = document.getElementById("jackpot-slide");
+
+function updateJackpotCounter() {
+  jackpotValue += Math.floor(Math.random() * 10 + 1); // เพิ่มทีละ 1–10
+  if (jackpotEl) {
+    jackpotEl.textContent = `🎰 แจ็กพอตล่าสุด: ${jackpotValue.toLocaleString('en-US')} บาท 💸`;
+  }
+}
+
+setInterval(updateJackpotCounter, 1000); // เพิ่มทุก 3 วินาที
+</script>
