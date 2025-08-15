@@ -29,6 +29,60 @@
     <div class="label">ผู้เล่นออนไลน์</div>
     <div id="online-count" class="value">กำลังโหลด...</div>
     <div id="online-time" class="timestamp"></div>
+<!-- 🔴 Ticker Slide -->
+<div class="section ticker" id="ticker">
+  <span id="ticker-slide">กำลังโหลดข้อมูล...</span>
+</div>
+
+<style>
+  .ticker {
+    white-space: nowrap;
+    overflow: hidden;
+    background: #222;
+    padding: 0.5rem;
+    border-top: 1px solid #444;
+    border-bottom: 1px solid #444;
+  }
+  .ticker span {
+    display: inline-block;
+    padding-right: 2rem;
+    animation: scroll 25s linear infinite;
+    color: #0f0;
+  }
+  @keyframes scroll {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+  }
+</style>
+
+<script>
+  const onlineURL = "https://moda48130-cloud.github.io/mssg/mock_online.json";
+  const jackpotURL = "https://moda48130-cloud.github.io/mssg/mock_jackpot.json";
+
+  async function updateTicker() {
+    try {
+      const [onlineRes, jackpotRes] = await Promise.all([
+        fetch(onlineURL).then(r => r.json()),
+        fetch(jackpotURL).then(r => r.json())
+      ]);
+
+      const onlineList = onlineRes.list || ["Guest01", "Guest02"];
+      const jackpotList = jackpotRes.list || ["฿1,000", "฿2,500"];
+
+      const tickerItems = [
+        ...onlineList.map(name => `🎮 ${name}`),
+        ...jackpotList.map(prize => `💰 ${prize}`)
+      ];
+
+      document.getElementById("ticker-slide").textContent = tickerItems.join(" • ");
+    } catch {
+      document.getElementById("ticker-slide").textContent = "ไม่สามารถโหลดข้อมูลได้";
+    }
+  }
+
+  updateTicker();
+  setInterval(updateTicker, 30000); // รีเฟรชทุก 30 วินาที
+</script>
   </div>
 
   <div class="box">
