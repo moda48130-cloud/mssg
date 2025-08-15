@@ -1,52 +1,102 @@
 <!DOCTYPE html>
 <html lang="th">
-<head>
-  <meta charset="UTF-8">
-  <title>Victoria Assets Monitor</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <header>
-    <h1>ยินดีต้อนรับสู่การแสดงตัวอย่างโครงการ</h1>
-  </header>
-  <main>
-    <section>
-      <h2>ผู้เล่นออนไลน์</h2>
-      <p>ข้อมูลเกี่ยวกับผู้เล่นออนไลน์จะแสดงที่นี่</p>
-      <!-- Optional: Add a script to fetch and display data from mock_online.json -->
-    </section>
-    <section>
-      <h2>ข้อมูลแจ็กพอต</h2>
-      <p>รายละเอียดเกี่ยวกับแจ็กพอตจะแสดงที่นี่</p>
-      <!-- Optional: Add a script to fetch and display data from mock_jackpot.json -->
-    </section>
-    <section class="status-box">
-      <div>
-        <span>ผู้เล่นออนไลน์:</span>
-        <span id="online-count">-</span>
-      </div>
-      <div>
-        <span>แจ็กพอต:</span>
-        <span id="jackpot-amount">-</span>
-      </div>
-      <div>
-        <span>อัปเดตล่าสุด:</span>
-        <span id="jackpot-time">-</span>
-      </div>
-    </section>
-    <section id="options" class="options-box">
-      <h3>ตั้งค่า</h3>
-      <label>
-        Refresh Interval (วินาที):
-        <input type="number" id="refresh-interval" min="5" value="10">
-      </label>
-      <button id="apply-options">บันทึก</button>
-    </section>
-  </main>
-  <footer>
-    <p>&copy; 2023 ชื่อโครงการ. สงวนลิขสิทธิ์.</p>
-  </footer>
-  <script src="script.js"></script>
-</body>
-</html>
 
+<head>
+    <meta charset="UTF-8">
+    <title>Mock Dashboard - Moda</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: #111;
+            color: #fff;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .box {
+            margin: 20px auto;
+            padding: 20px;
+            background: #222;
+            border-radius: 8px;
+            width: 300px;
+        }
+        
+        .label {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        
+        .value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #0f0;
+        }
+        
+        .timestamp {
+            font-size: 0.9em;
+            color: #ccc;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box">
+        <div class="label">ผู้เล่นออนไลน์</div>
+        <div id="online-count" class="value">กำลังโหลด...</div>
+        <div id="online-time" class="timestamp"></div>
+    </div>
+
+    <div class="box">
+        <div class="label">ยอดแจ็กพอต</div>
+        <div id="jackpot-amount" class="value">กำลังโหลด...</div>
+        <div id="jackpot-time" class="timestamp"></div>
+    </div>
+
+    <script>
+        function formatTime() {
+            const now = new Date();
+            return now.toLocaleString('th-TH', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+            });
+        }
+
+        function fetchData() {
+            Promise.all([
+                    fetch('https://moda48130-cloud.github.io/mssg/mock_online.json').then(res => res.json()),
+                    fetch('https://moda48130-cloud.github.io/mssg/mock_jackpot.json').then(res => res.json())
+                ])
+                .then(([onlineData, jackpotData]) => {
+                    const onlineCountElement = document.getElementById('online-count');
+                    const jackpotAmountElement = document.getElementById('jackpot-amount');
+                    const onlineTimeElement = document.getElementById('online-time');
+                    const jackpotTimeElement = document.getElementById('jackpot-time');
+
+                    if (onlineCountElement && onlineData.online) {
+                        onlineCountElement.textContent = onlineData.online;
+                        onlineTimeElement.textContent = 'อัปเดตล่าสุด: ' + formatTime();
+                    }
+
+                    if (jackpotAmountElement && jackpotData.jackpot) {
+                        jackpotAmountElement.textContent = jackpotData.jackpot.toLocaleString('en-US');
+                        jackpotTimeElement.textContent = 'อัปเดตล่าสุด: ' + formatTime();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    document.getElementById('online-count').textContent = 'N/A';
+                    document.getElementById('jackpot-amount').textContent = 'N/A';
+                });
+        }
+
+        fetchData();
+        setInterval(fetchData, 10000);
+    </script>
+</body>
+
+</html>

@@ -126,3 +126,22 @@
                                                                                         const formattedTime = rawTime.toLocaleString('th-TH', options);
                                                                                             document.getElementById('lastUpdated').textContent = formattedTime + ' น.';
                                                                                               });
+                                                                                              function updateLiveTimestamp() {
+                                                                                                  const now = new Date();
+                                                                                                    const options = {
+                                                                                                        timeZone: 'Asia/Bangkok',
+                                                                                                            year: 'numeric',
+                                                                                                                month: 'long',
+                                                                                                                    day: 'numeric',
+                                                                                                                        hour: '2-digit',
+                                                                                                                            minute: '2-digit',
+                                                                                                                                second: '2-digit',
+                                                                                                                                    hour12: false
+                                                                                                                                      };
+                                                                                                                                        const formatted = now.toLocaleString('th-TH', options);
+                                                                                                                                          document.getElementById('lastUpdated').textContent = formatted + ' น.';
+                                                                                                                                          }
+
+                                                                                                                                          updateLiveTimestamp(); // โหลดครั้งแรก
+                                                                                                                                          setInterval(updateLiveTimestamp, 1000); // อัปเดตทุกวินาที
+                                                                                              }
